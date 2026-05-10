@@ -5,11 +5,15 @@ const dns = require("node:dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]); // Cloudflare + Google DNS
 
 const express = require('express')
+const cors = require('cors')
 const app = express()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 8000
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.MONGO_DB_URI
+
+app.use(cors())
+app.use(express.json())
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -22,20 +26,28 @@ const client = new MongoClient(uri, {
 
 const run = async () => {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-        // Send a ping to confirm a successful connection
+        const db = client.db('wanderlust-db')
+        const destinationCollection = db.collection("destinations")
+
+        app.post('/destination', async (req, res) => {
+            const destinationData = req.body
+
+            console.log(destinationData)
+            const result = await destinationCollection.insertOne(destinationData)
+            res.json(result)
+        })
+
         await client.db("admin").command({ ping: 1 });
         console.log("Successfully connected to MongoDB!");
     } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
+        // await client.close();
     }
 }
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Hello World! from Sabbir')
 })
 
 app.listen(port, () => {
