@@ -1,15 +1,15 @@
-require('dotenv').config()
-
 // dns server for mongodb connection
 const dns = require("node:dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]); // Cloudflare + Google DNS
+
+require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 8000
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGO_DB_URI
 
 app.use(cors())
@@ -29,6 +29,18 @@ const run = async () => {
         await client.connect();
         const db = client.db('wanderlust-db')
         const destinationCollection = db.collection("destinations")
+
+        app.get('/destination', async (req, res) => {
+            const result = await destinationCollection.find().toArray()
+            res.json(result)
+        })
+
+        app.get('/destination/:id', async (req, res) => {
+            const { id } = req.params
+
+            const result = await destinationCollection.findOne({ _id: new ObjectId(id) })
+            res.json(result)
+        })
 
         app.post('/destination', async (req, res) => {
             const destinationData = req.body
