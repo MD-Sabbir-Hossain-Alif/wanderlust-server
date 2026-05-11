@@ -42,6 +42,14 @@ const run = async () => {
             res.json(result)
         })
 
+        app.post('/destination', async (req, res) => {
+            const destinationData = req.body
+
+            // console.log(destinationData)
+            const result = await destinationCollection.insertOne(destinationData)
+            res.json(result)
+        })
+
         app.patch('/destination/:id', async (req, res) => {
             const { id } = req.params
             const updatedFormData = req.body
@@ -50,11 +58,9 @@ const run = async () => {
             res.json(result)
         })
 
-        app.post('/destination', async (req, res) => {
-            const destinationData = req.body
-
-            // console.log(destinationData)
-            const result = await destinationCollection.insertOne(destinationData)
+        app.delete('/destination/:id', async (req, res) => {
+            const { id } = req.params
+            const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
             res.json(result)
         })
 
