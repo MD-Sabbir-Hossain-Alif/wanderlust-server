@@ -45,10 +45,10 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const { payload } = await jwtVerify(token, JWKS)
-        console.log(payload)
+        // console.log(payload)
         next()
     } catch (error) {
-        console.log('Token validation failed:', error)
+        // console.log('Token validation failed:', error)
         return res.status(401).json({ message: "Forbidden" })
     }
 
@@ -61,7 +61,7 @@ const run = async () => {
         const destinationCollection = db.collection("destinations")
         const bookingCollection = db.collection('bookings')
 
-        app.get('/destination', verifyToken, async (req, res) => {
+        app.get('/destination', async (req, res) => {
             const result = await destinationCollection.find().toArray()
             res.json(result)
         })
